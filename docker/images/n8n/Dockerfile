@@ -7,6 +7,8 @@ ARG TARGETPLATFORM
 # STAGE 1: System Dependencies & Base Setup
 # ==============================================================================
 FROM n8nio/base:${NODE_VERSION} AS system-deps
+RUN rm -rf /var/cache/apk/* /tmp/* /root/.npm
+
 
 # ==============================================================================
 # STAGE 2: Application Artifact Processor
@@ -14,6 +16,8 @@ FROM n8nio/base:${NODE_VERSION} AS system-deps
 FROM alpine:3.22.0 AS app-artifact-processor
 
 COPY ./compiled /app/
+RUN rm -rf /tmp/* /root/.npm
+
 
 # ==============================================================================
 # STAGE 3: Task Runner Launcher
@@ -35,7 +39,7 @@ RUN set -e; \
     sha256sum -c checksum.sha256; \
     mkdir -p /launcher-bin; \
     tar xzf task-runner-launcher-${LAUNCHER_VERSION}-linux-${ARCH_NAME}.tar.gz -C /launcher-bin; \
-    cd / && rm -rf /launcher-temp
+    cd / && rm -rf /launcher-temp /tmp/* /root/.npm /var/cache/apk/*
 
 # ==============================================================================
 # STAGE 4: Final Runtime Image
